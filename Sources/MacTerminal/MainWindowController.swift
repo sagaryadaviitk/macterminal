@@ -9,6 +9,13 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
 
     private enum Metrics {
         static let contentCornerRadius: CGFloat = 16
+        static let contentBorderWidth: CGFloat = 1
+    }
+
+    private enum Chrome {
+        static let fallbackWindowBackground = NSColor(calibratedRed: 0.11, green: 0.12, blue: 0.14, alpha: 1)
+        static let fallbackContentBackground = NSColor(calibratedRed: 0.07, green: 0.08, blue: 0.09, alpha: 1)
+        static let contentBorder = NSColor(calibratedWhite: 1, alpha: 0.14)
     }
 
     private let tabViewController: NSTabViewController = {
@@ -26,8 +33,12 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         window.setContentSize(NSSize(width: 1080, height: 680))
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.titlebarAppearsTransparent = false
-        window.isOpaque = false
-        window.backgroundColor = .clear
+        window.titleVisibility = .visible
+        window.toolbarStyle = .expanded
+        window.appearance = NSAppearance(named: .darkAqua)
+        window.isMovableByWindowBackground = true
+        window.isOpaque = true
+        window.backgroundColor = Self.windowBackgroundColor(for: profile)
         window.setFrameAutosaveName("MacTerminalMainWindow")
         window.center()
 
@@ -200,6 +211,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         toolbar.delegate = self
         toolbar.displayMode = .iconOnly
         toolbar.allowsUserCustomization = false
+        toolbar.showsBaselineSeparator = true
         window?.toolbar = toolbar
     }
 
@@ -209,9 +221,17 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         }
 
         contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = Self.contentBackgroundColor(for: profile).cgColor
         contentView.layer?.cornerRadius = Metrics.contentCornerRadius
         contentView.layer?.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        contentView.layer?.borderColor = Chrome.contentBorder.cgColor
+        contentView.layer?.borderWidth = Metrics.contentBorderWidth
         contentView.layer?.masksToBounds = true
+    }
+
+    private func applyWindowChrome() {
+        window?.backgroundColor = Self.windowBackgroundColor(for: profile)
+        window?.contentView?.layer?.backgroundColor = Self.contentBackgroundColor(for: profile).cgColor
     }
 
     private var activeRootViewController: SplitRootViewController? {
@@ -285,9 +305,18 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
 
     @objc private func preferencesDidChange(_ notification: Notification) {
         profile = AppPreferencesStore.shared.activeProfile
+        applyWindowChrome()
         for controller in rootViewControllers {
             controller.apply(profile: profile)
         }
+    }
+
+    private static func windowBackgroundColor(for profile: TerminalProfile) -> NSColor {
+        NSColor(hex: profile.theme.inactiveTitlebarHex) ?? Chrome.fallbackWindowBackground
+    }
+
+    private static func contentBackgroundColor(for profile: TerminalProfile) -> NSColor {
+        NSColor(hex: profile.theme.backgroundHex) ?? Chrome.fallbackContentBackground
     }
 
     private static func loadPersistedLayout() -> SplitNode? {

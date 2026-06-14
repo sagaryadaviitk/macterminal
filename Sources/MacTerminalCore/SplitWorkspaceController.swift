@@ -23,7 +23,7 @@ public final class SplitWorkspaceController {
     ) {
         let resolvedProfile = profile?.normalized(homeDirectory: homeDirectory)
         if let root, let panes, let activePaneID, panes[activePaneID] != nil {
-            self.root = root.clampingRatios()
+            self.root = root.clampingRatios().balancingEqualSplitRatios()
             self.panes = panes
             self.activePaneID = activePaneID
         } else {
@@ -68,7 +68,7 @@ public final class SplitWorkspaceController {
         root = root.replacingPane(
             sourcePane.id,
             with: .split(axis: axis, ratio: 0.5, first: .pane(sourcePane.id), second: .pane(newPane.id))
-        )
+        ).balancingEqualSplitRatios()
         setActivePane(newPane.id, notifyLayout: false)
         delegate?.workspaceDidChangeLayout(self)
         return newPane.id
@@ -91,7 +91,7 @@ public final class SplitWorkspaceController {
         }
 
         panes[paneToRemove] = nil
-        root = collapsedRoot
+        root = collapsedRoot.balancingEqualSplitRatios()
         activePaneID = nextActive
         markOnlyActivePane()
         delegate?.workspace(self, didRemovePane: paneToRemove)
@@ -161,7 +161,7 @@ public final class SplitWorkspaceController {
             panes[pane.id] = pane
             return pane.id
         }
-        let clampedRoot = remappedRoot.clampingRatios()
+        let clampedRoot = remappedRoot.clampingRatios().balancingEqualSplitRatios()
         let activeID = clampedRoot.paneIDs.first ?? UUID()
         if var active = panes[activeID] {
             active.isActive = true

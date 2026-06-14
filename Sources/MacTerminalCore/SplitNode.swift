@@ -91,4 +91,31 @@ public indirect enum SplitNode: Codable, Equatable, Sendable {
             )
         }
     }
+
+    public func balancingEqualSplitRatios() -> SplitNode {
+        switch self {
+        case .pane:
+            return self
+        case let .split(axis, _, first, second):
+            let balancedFirst = first.balancingEqualSplitRatios()
+            let balancedSecond = second.balancingEqualSplitRatios()
+            let firstWeight = balancedFirst.layoutWeight(along: axis)
+            let secondWeight = balancedSecond.layoutWeight(along: axis)
+            let totalWeight = firstWeight + secondWeight
+            let ratio = totalWeight > 0 ? firstWeight / totalWeight : 0.5
+            return .split(axis: axis, ratio: ratio, first: balancedFirst, second: balancedSecond)
+        }
+    }
+
+    private func layoutWeight(along axis: SplitAxis) -> Double {
+        switch self {
+        case .pane:
+            return 1
+        case let .split(splitAxis, _, first, second):
+            if splitAxis == axis {
+                return first.layoutWeight(along: axis) + second.layoutWeight(along: axis)
+            }
+            return 1
+        }
+    }
 }

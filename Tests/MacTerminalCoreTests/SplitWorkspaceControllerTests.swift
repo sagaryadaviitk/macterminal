@@ -41,6 +41,62 @@ final class SplitWorkspaceControllerTests: XCTestCase {
         )
     }
 
+    func testRepeatedRightSplitsBalancePaneWidths() {
+        let workspace = SplitWorkspaceController(shellPath: "/bin/zsh", homeDirectory: "/tmp")
+        let firstPaneID = workspace.activePaneID
+        let secondPaneID = workspace.splitActive(axis: .leftRight)
+        let thirdPaneID = workspace.splitActive(axis: .leftRight)
+        let fourthPaneID = workspace.splitActive(axis: .leftRight)
+
+        XCTAssertEqual(workspace.orderedPaneIDs, [firstPaneID, secondPaneID, thirdPaneID, fourthPaneID])
+
+        guard case let .split(rootAxis, rootRatio, rootFirst, rootSecond) = workspace.root else {
+            return XCTFail("Expected root split")
+        }
+        XCTAssertEqual(rootAxis, .leftRight)
+        XCTAssertEqual(rootFirst, .pane(firstPaneID))
+        XCTAssertEqual(rootRatio, 0.25, accuracy: 0.0001)
+
+        guard case let .split(secondAxis, secondRatio, secondFirst, secondSecond) = rootSecond else {
+            return XCTFail("Expected second split")
+        }
+        XCTAssertEqual(secondAxis, .leftRight)
+        XCTAssertEqual(secondFirst, .pane(secondPaneID))
+        XCTAssertEqual(secondRatio, 1.0 / 3.0, accuracy: 0.0001)
+
+        guard case let .split(thirdAxis, thirdRatio, thirdFirst, thirdSecond) = secondSecond else {
+            return XCTFail("Expected third split")
+        }
+        XCTAssertEqual(thirdAxis, .leftRight)
+        XCTAssertEqual(thirdFirst, .pane(thirdPaneID))
+        XCTAssertEqual(thirdSecond, .pane(fourthPaneID))
+        XCTAssertEqual(thirdRatio, 0.5, accuracy: 0.0001)
+    }
+
+    func testOrthogonalSplitsBalanceWithinTheirOwnAxis() {
+        let workspace = SplitWorkspaceController(shellPath: "/bin/zsh", homeDirectory: "/tmp")
+        let firstPaneID = workspace.activePaneID
+        let secondPaneID = workspace.splitActive(axis: .leftRight)
+        let thirdPaneID = workspace.splitActive(axis: .topBottom)
+
+        XCTAssertEqual(workspace.orderedPaneIDs, [firstPaneID, secondPaneID, thirdPaneID])
+
+        guard case let .split(rootAxis, rootRatio, rootFirst, rootSecond) = workspace.root else {
+            return XCTFail("Expected root split")
+        }
+        XCTAssertEqual(rootAxis, .leftRight)
+        XCTAssertEqual(rootFirst, .pane(firstPaneID))
+        XCTAssertEqual(rootRatio, 0.5, accuracy: 0.0001)
+
+        guard case let .split(childAxis, childRatio, childFirst, childSecond) = rootSecond else {
+            return XCTFail("Expected vertical child split")
+        }
+        XCTAssertEqual(childAxis, .topBottom)
+        XCTAssertEqual(childFirst, .pane(secondPaneID))
+        XCTAssertEqual(childSecond, .pane(thirdPaneID))
+        XCTAssertEqual(childRatio, 0.5, accuracy: 0.0001)
+    }
+
     func testCloseActivePaneCollapsesParentAndFocusesNeighbor() {
         let workspace = SplitWorkspaceController(shellPath: "/bin/zsh", homeDirectory: "/tmp")
         let originalPaneID = workspace.activePaneID
@@ -94,7 +150,7 @@ final class SplitWorkspaceControllerTests: XCTestCase {
         XCTAssertEqual(workspace.panes.count, 2)
 
         if case let .split(_, ratio, _, _) = workspace.root {
-            XCTAssertEqual(ratio, 0.85)
+            XCTAssertEqual(ratio, 0.5)
         } else {
             XCTFail("Expected split root")
         }

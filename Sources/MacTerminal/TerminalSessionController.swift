@@ -103,6 +103,8 @@ final class TerminalSessionController: NSObject, LocalProcessTerminalViewDelegat
         terminalView.processDelegate = self
         terminalView.wantsLayer = true
         terminalView.autoresizingMask = []
+        terminalView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        terminalView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         terminalView.metalBufferingMode = .perFrameAggregated
 
         do {

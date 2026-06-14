@@ -186,8 +186,8 @@ final class SplitRootViewController: NSViewController, SplitWorkspaceControllerD
 
         case let .split(axis, ratio, first, second):
             let controller = SplitContainerViewController(axis: axis, ratio: ratio)
-            controller.addSplitViewItem(NSSplitViewItem(viewController: makeController(for: first)))
-            controller.addSplitViewItem(NSSplitViewItem(viewController: makeController(for: second)))
+            controller.addPaneViewController(makeController(for: first))
+            controller.addPaneViewController(makeController(for: second))
             return controller
         }
     }

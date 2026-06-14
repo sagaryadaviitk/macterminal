@@ -45,6 +45,8 @@ final class TerminalPaneViewController: NSViewController {
     override func loadView() {
         let rootView = NSView()
         rootView.wantsLayer = true
+        rootView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        rootView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         view = rootView
         applyBackgroundColor()
 
@@ -155,6 +157,7 @@ final class TerminalPaneViewController: NSViewController {
     private func configureTitleBar() {
         titleBar.translatesAutoresizingMaskIntoConstraints = false
         titleBar.wantsLayer = true
+        titleBar.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         titleBar.onMouseDown = { [weak self] in
             self?.focusPane()
         }
@@ -162,11 +165,13 @@ final class TerminalPaneViewController: NSViewController {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.lineBreakMode = .byTruncatingMiddle
         titleLabel.font = .systemFont(ofSize: 11, weight: .semibold)
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         statusLabel.lineBreakMode = .byTruncatingMiddle
         statusLabel.font = .systemFont(ofSize: 10)
         statusLabel.textColor = .secondaryLabelColor
+        statusLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.bezelStyle = .regularSquare
@@ -200,6 +205,8 @@ final class TerminalPaneViewController: NSViewController {
     private func configureTerminalContainer() {
         terminalContainerView.translatesAutoresizingMaskIntoConstraints = false
         terminalContainerView.wantsLayer = true
+        terminalContainerView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        terminalContainerView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         applyBackgroundColor()
     }
 

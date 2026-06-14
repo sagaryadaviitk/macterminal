@@ -2,6 +2,10 @@ import AppKit
 import MacTerminalCore
 
 final class SplitContainerViewController: NSSplitViewController {
+    private enum Metrics {
+        static let minimumPaneThickness: CGFloat = 96
+    }
+
     private let axis: SplitAxis
     private let ratio: Double
     private var appliedInitialRatio = false
@@ -23,6 +27,14 @@ final class SplitContainerViewController: NSSplitViewController {
         splitView.dividerStyle = .thin
         splitView.wantsLayer = true
         splitView.layer?.backgroundColor = NSColor.black.cgColor
+    }
+
+    func addPaneViewController(_ viewController: NSViewController) {
+        let item = NSSplitViewItem(viewController: viewController)
+        item.canCollapse = false
+        item.minimumThickness = Metrics.minimumPaneThickness
+        item.holdingPriority = .defaultLow
+        addSplitViewItem(item)
     }
 
     override func viewDidLayout() {
