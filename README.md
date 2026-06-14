@@ -1,71 +1,81 @@
 # MacTerminal
 
-MacTerminal is a native macOS terminal app with real local shell panes, tabs, horizontal and vertical splits, profile-backed preferences, pane focus cycling, and a local `.app` packaging script.
+MacTerminal is a native macOS terminal app with local shell panes, tabs, horizontal and vertical splits, profile-backed preferences, and pane focus controls.
 
-## Requirements
+## What It Does
 
-- macOS 14 or newer
-- Xcode 26.3 / Swift 6.2
+- Runs real local shell sessions inside a packaged macOS app.
+- Supports tabs, right splits, down splits, pane closing, and pane focus cycling.
+- Stores terminal profiles for shell path, startup directory, fonts, colors, cursor style, `TERM`, scrollback, and environment overrides.
+- Packages as `MacTerminal.app` for Finder, Dock, and Spotlight launch.
 
-## Build
+## Use It Yourself
 
-```sh
-swift build
-```
-
-Regenerate the app icon after changing `scripts/generate_app_icon.swift`:
+Build and open a local app bundle:
 
 ```sh
-swift scripts/generate_app_icon.swift
-iconutil -c icns Resources/MacTerminal.iconset -o Resources/MacTerminal.icns
+./scripts/run_app.sh
 ```
 
-Or with Xcode's package scheme:
-
-```sh
-xcodebuild -scheme MacTerminal -destination 'platform=macOS' build
-```
-
-## Run As An App
+Or package it manually:
 
 ```sh
 ./scripts/package_app.sh
 open .build/debug/MacTerminal.app
 ```
 
-You can also run:
+Common shortcuts:
 
-```sh
-./scripts/run_app.sh
-```
+- `Cmd+T`: new tab
+- `Cmd+D`: split right
+- `Shift+Cmd+D`: split down
+- `Cmd+W`: close active pane
+- `Shift+Cmd+W`: close tab
+- `Cmd+[` / `Cmd+]`: focus previous or next pane
+- `Cmd+,`: preferences
 
-Install into `~/Applications` for Spotlight:
+## Find It In Spotlight
+
+Install or update the app in `~/Applications`:
 
 ```sh
 ./scripts/install_app.sh
 ```
 
-## Shortcuts
+The install script builds `MacTerminal.app`, copies it to `~/Applications`, refreshes Launch Services, and imports Spotlight metadata when `mdimport` is available.
 
-- `Cmd+T`: new tab.
-- `Cmd+D`: split active pane right.
-- `Shift+Cmd+D`: split active pane down.
-- `Cmd+W`: close active pane. The final pane is kept open.
-- `Shift+Cmd+W`: close tab.
-- `Cmd+[` / `Cmd+]`: focus previous or next pane.
-- `Shift+Cmd+{` / `Shift+Cmd+}`: previous or next tab.
-- `Cmd+Plus` / `Cmd+Minus`: change font size for the current tab.
-- `Cmd+,`: preferences.
+After install, press `Cmd+Space` and search for `MacTerminal`. If it does not appear immediately, open it once from `~/Applications` and search again.
 
-## Preferences
+## Develop Locally
 
-Preferences are stored under the app bundle ID `com.sagaryadav.macterminal`.
-The active profile controls shell path, startup directory, login-shell behavior,
-font family/size, terminal colors, cursor style, `TERM`, scrollback, and
-environment overrides.
+Requirements:
 
-## Test
+- macOS 14 or newer
+- Xcode 26.3 / Swift 6.2
+- Xcode Command Line Tools available on `PATH`
+
+Build:
+
+```sh
+swift build
+```
+
+Run tests:
 
 ```sh
 swift test
 ```
+
+Build with Xcode:
+
+```sh
+xcodebuild -scheme MacTerminal -destination 'platform=macOS' build
+```
+
+## Contribute
+
+Fork the repo, create a focused branch, and open a pull request with the behavior change and the tests you ran. Keep local app bundles, build products, shell history, and machine-specific paths out of commits.
+
+## Production Notes
+
+The packaging scripts create an ad-hoc signed app for local use. Public distribution should use Developer ID signing and notarization.
