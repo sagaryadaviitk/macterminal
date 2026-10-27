@@ -111,7 +111,7 @@ The packaging scripts create an ad-hoc signed app for local use. Public distribu
 
 SwiftTerm is pinned to a fork of version 1.13.0 with a small macOS renderer change:
 [`77b7b23`](https://github.com/sagaryadaviitk/SwiftTerm/commit/77b7b23ac3aaa0c8a6ead9866e085732d50e4118)
-adds an optional foreground color for selected text. MacTerminal uses light cream
+adds an optional foreground color for selected text. MacTerminal uses very light blue
 with dark selected text; unselected ANSI colors remain unchanged. The fork keeps
 SwiftTerm's original behavior when the optional color is unset. SwiftPM fetches
 the pinned commit automatically during a normal build or installation.

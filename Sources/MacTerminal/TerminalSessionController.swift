@@ -127,8 +127,8 @@ final class TerminalSessionController: NSObject, LocalProcessTerminalViewDelegat
         terminalView.font = font
         terminalView.nativeForegroundColor = foreground
         terminalView.nativeBackgroundColor = background
-        // Light cream with dark selected text, independent of the macOS accent.
-        terminalView.selectedTextBackgroundColor = NSColor(srgbRed: 1, green: 0.95, blue: 0.80, alpha: 1)
+        // Very light blue with dark selected text, independent of the macOS accent.
+        terminalView.selectedTextBackgroundColor = NSColor(srgbRed: 214.0 / 255, green: 234.0 / 255, blue: 1, alpha: 1)
         terminalView.selectedTextForegroundColor = NSColor(srgbRed: 0.12, green: 0.12, blue: 0.12, alpha: 1)
         terminalView.layer?.backgroundColor = background.cgColor
         terminalView.caretColor = caret
