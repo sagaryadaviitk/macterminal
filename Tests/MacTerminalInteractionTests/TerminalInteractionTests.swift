@@ -35,4 +35,35 @@ final class TerminalInteractionTests: XCTestCase {
         XCTAssertEqual(focusedPane, 2)
         XCTAssertTrue(window.firstResponder === second)
     }
+
+    @MainActor
+    func testSingleMovementDragStartsAtMouseDown() async {
+        _ = NSApplication.shared
+        let window = TerminalWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 640, height: 400),
+            styleMask: [.titled], backing: .buffered, defer: false
+        )
+        let terminal = FocusReportingTerminalView(frame: NSRect(x: 0, y: 0, width: 640, height: 400))
+        terminal.setUseMetal(false)
+        window.contentView = terminal
+        terminal.feed(text: "SELECT_THIS_TEXT_12345")
+        window.orderFront(nil)
+        defer { window.orderOut(nil) }
+        let rowHeight = terminal.bounds.height / CGFloat(terminal.getTerminal().rows)
+        let y = terminal.bounds.height - rowHeight / 2
+        func mouse(_ type: NSEvent.EventType, x: CGFloat) -> NSEvent {
+            NSEvent.mouseEvent(
+                with: type, location: NSPoint(x: x, y: y), modifierFlags: [],
+                timestamp: 0, windowNumber: window.windowNumber, context: nil,
+                eventNumber: 1, clickCount: 1, pressure: 1
+            )!
+        }
+        window.sendEvent(mouse(.leftMouseDown, x: 1))
+        window.sendEvent(mouse(.leftMouseDragged, x: 160))
+        window.sendEvent(mouse(.leftMouseUp, x: 160))
+        let selection = terminal.selectedRange()
+        XCTAssertEqual(selection.location, 0)
+        XCTAssertGreaterThan(selection.length, 1)
+    }
+
 }
