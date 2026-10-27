@@ -47,8 +47,6 @@ final class TerminalInteractionTests: XCTestCase {
         try terminal.setUseMetal(false)
         window.contentView = terminal
         terminal.feed(text: "SELECT_THIS_TEXT_12345")
-        window.orderFront(nil)
-        defer { window.orderOut(nil) }
         let rowHeight = terminal.bounds.height / CGFloat(terminal.getTerminal().rows)
         let y = terminal.bounds.height - rowHeight / 2
         func mouse(_ type: NSEvent.EventType, x: CGFloat) -> NSEvent {
@@ -58,9 +56,15 @@ final class TerminalInteractionTests: XCTestCase {
                 eventNumber: 1, clickCount: 1, pressure: 1
             )!
         }
-        window.sendEvent(mouse(.leftMouseDown, x: 1))
-        window.sendEvent(mouse(.leftMouseDragged, x: 160))
-        window.sendEvent(mouse(.leftMouseUp, x: 160))
+        let down = mouse(.leftMouseDown, x: 1)
+        let drag = mouse(.leftMouseDragged, x: 160)
+        // Exercise the window hook and SwiftTerm together without relying on
+        // AppKit dispatch to a foreground application in the headless runner.
+        window.sendEvent(down)
+        terminal.mouseDown(with: down)
+        window.sendEvent(drag)
+        terminal.mouseDragged(with: drag)
+        terminal.mouseUp(with: mouse(.leftMouseUp, x: 160))
         let selection = terminal.selectedRange()
         XCTAssertEqual(selection.location, 0)
         XCTAssertGreaterThan(selection.length, 1)
