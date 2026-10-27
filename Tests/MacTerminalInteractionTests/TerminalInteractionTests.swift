@@ -1,5 +1,6 @@
 import AppKit
 import XCTest
+@testable import SwiftTerm
 @testable import MacTerminal
 
 final class TerminalInteractionTests: XCTestCase {
@@ -68,6 +69,31 @@ final class TerminalInteractionTests: XCTestCase {
         let selection = terminal.selectedRange()
         XCTAssertEqual(selection.location, 0)
         XCTAssertGreaterThan(selection.length, 1)
+    }
+
+    @MainActor
+    func testSelectionForegroundOverridesOnlySelectedText() async throws {
+        _ = NSApplication.shared
+        let terminal = FocusReportingTerminalView(frame: NSRect(x: 0, y: 0, width: 640, height: 400))
+        try terminal.setUseMetal(false)
+        terminal.feed(text: "\u{1B}[32mSUCCESS\u{1B}[0m")
+        let engine = terminal.getTerminal()
+        let line = try XCTUnwrap(engine.getLine(row: 0))
+        func foreground() throws -> NSColor {
+            let rendered = terminal.buildAttributedString(row: 0, line: line, cols: engine.cols)
+            let segment = try XCTUnwrap(rendered.segments.first)
+            return try XCTUnwrap(segment.attributedString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? NSColor)
+        }
+        let original = try foreground()
+        let selected = NSColor(srgbRed: 0.12, green: 0.12, blue: 0.12, alpha: 1)
+        terminal.selectedTextForegroundColor = selected
+        terminal.selectAll()
+        XCTAssertEqual(try foreground(), selected)
+        terminal.selectNone()
+        XCTAssertEqual(try foreground(), original)
+        terminal.selectedTextForegroundColor = nil
+        terminal.selectAll()
+        XCTAssertEqual(try foreground(), original)
     }
 
 }

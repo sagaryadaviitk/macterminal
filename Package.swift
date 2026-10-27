@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "MacTerminalCore", targets: ["MacTerminalCore"])
     ],
     dependencies: [
-        .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", exact: "1.13.0")
+        .package(url: "https://github.com/sagaryadaviitk/SwiftTerm.git", revision: "77b7b23ac3aaa0c8a6ead9866e085732d50e4118")
     ],
     targets: [
         .target(
@@ -38,7 +38,7 @@ let package = Package(
         ),
         .testTarget(
             name: "MacTerminalInteractionTests",
-            dependencies: ["MacTerminal"]
+            dependencies: ["MacTerminal", "SwiftTerm"]
         )
     ]
 )
