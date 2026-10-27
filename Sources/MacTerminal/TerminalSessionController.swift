@@ -127,6 +127,9 @@ final class TerminalSessionController: NSObject, LocalProcessTerminalViewDelegat
         terminalView.font = font
         terminalView.nativeForegroundColor = foreground
         terminalView.nativeBackgroundColor = background
+        // Use a neutral selection highlight independent of the macOS accent.
+        // Keep the existing text colors readable against the dark theme.
+        terminalView.selectedTextBackgroundColor = NSColor(srgbRed: 0.25, green: 0.25, blue: 0.25, alpha: 1)
         terminalView.layer?.backgroundColor = background.cgColor
         terminalView.caretColor = caret
         terminalView.changeScrollback(profile.scrollbackLines)
