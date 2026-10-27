@@ -68,6 +68,10 @@ final class TerminalPaneViewController: NSViewController {
         configureTitleBar()
         configureTerminalContainer()
         let terminalView = sessionController.terminalView
+        terminalView.onFocus = { [weak self] in
+            guard let self else { return }
+            self.workspace.setActivePane(self.paneID)
+        }
 
         rootView.addSubview(titleBar)
         rootView.addSubview(terminalContainerView)

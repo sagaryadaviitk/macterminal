@@ -35,6 +35,10 @@ let package = Package(
         .testTarget(
             name: "MacTerminalCoreTests",
             dependencies: ["MacTerminalCore"]
+        ),
+        .testTarget(
+            name: "MacTerminalInteractionTests",
+            dependencies: ["MacTerminal"]
         )
     ]
 )

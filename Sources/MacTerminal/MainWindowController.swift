@@ -27,7 +27,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
     private var profile = AppPreferencesStore.shared.activeProfile
 
     init() {
-        let window = NSWindow(contentViewController: tabViewController)
+        let window = TerminalWindow(contentViewController: tabViewController)
         window.title = "MacTerminal"
         window.minSize = NSSize(width: 720, height: 420)
         window.setContentSize(NSSize(width: 1080, height: 680))
@@ -36,7 +36,9 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         window.titleVisibility = .visible
         window.toolbarStyle = .expanded
         window.appearance = NSAppearance(named: .darkAqua)
-        window.isMovableByWindowBackground = true
+        // Only the title bar should move a terminal window. Content drags belong
+        // to text selection, including when a pane has not received focus yet.
+        window.isMovableByWindowBackground = false
         window.isOpaque = true
         window.backgroundColor = Self.windowBackgroundColor(for: profile)
         window.setFrameAutosaveName("MacTerminalMainWindow")
