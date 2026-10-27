@@ -37,14 +37,14 @@ final class TerminalInteractionTests: XCTestCase {
     }
 
     @MainActor
-    func testSingleMovementDragStartsAtMouseDown() async {
+    func testSingleMovementDragStartsAtMouseDown() async throws {
         _ = NSApplication.shared
         let window = TerminalWindow(
             contentRect: NSRect(x: 0, y: 0, width: 640, height: 400),
             styleMask: [.titled], backing: .buffered, defer: false
         )
         let terminal = FocusReportingTerminalView(frame: NSRect(x: 0, y: 0, width: 640, height: 400))
-        terminal.setUseMetal(false)
+        try terminal.setUseMetal(false)
         window.contentView = terminal
         terminal.feed(text: "SELECT_THIS_TEXT_12345")
         window.orderFront(nil)
